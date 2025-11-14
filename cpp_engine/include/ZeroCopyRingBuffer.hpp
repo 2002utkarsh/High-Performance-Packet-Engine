@@ -17,20 +17,20 @@ public:
     bool Emplace(Args&&... args) {
         const size_t current_head = head_.load(std::memory_order_relaxed);
         const size_t next_head = (current_head + 1) & mask_;
-        if (next_head == tail_.load(std::memory_order_relaxed)) { return false; }
+        if (next_head == tail_.load(std::memory_order_acquire)) { return false; }
         pool_[current_head] = T(std::forward<Args>(args)...);
-        head_.store(next_head, std::memory_order_relaxed);
+        head_.store(next_head, std::memory_order_release);
         return true;
     }
     bool Pop(T& out_item) {
         const size_t current_tail = tail_.load(std::memory_order_relaxed);
-        if (current_tail == head_.load(std::memory_order_relaxed)) { return false; }
+        if (current_tail == head_.load(std::memory_order_acquire)) { return false; }
         out_item = std::move(pool_[current_tail]);
-        tail_.store((current_tail + 1) & mask_, std::memory_order_relaxed);
+        tail_.store((current_tail + 1) & mask_, std::memory_order_release);
         return true;
     }
     [[nodiscard]] size_t AvailableCapacity() const {
-        return Capacity - (head_.load(std::memory_order_relaxed) - tail_.load(std::memory_order_relaxed));
+        return Capacity - (head_.load(std::memory_order_acquire) - tail_.load(std::memory_order_acquire));
     }
 private:
     alignas(64) std::atomic<size_t> head_{0};
