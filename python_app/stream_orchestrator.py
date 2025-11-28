@@ -18,7 +18,7 @@ class Interface:
     def stats(self) -> int:
         return self.lib.engine_get_processed_count(self.handle)
 if __name__ == "__main__":
-    driver = Interface("./libingestion_engine.so")
+    driver = Interface("../cpp_engine/build/libingestion_engine.so")
     try:
         while True:
             time.sleep(1)
