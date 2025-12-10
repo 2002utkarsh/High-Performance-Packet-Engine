@@ -1,1 +1,10 @@
+__pycache__/
+*.pyc
+*.pth
+*.parquet
+*.dylib
+*.so
+build/
 z_forge.py
+forge.py
+forge_history.ps1
